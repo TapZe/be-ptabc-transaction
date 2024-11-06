@@ -12,7 +12,7 @@ class ProductType extends Model
      *
      * @var array
      */
-    protected $fillable = ['type'];
+    protected $fillable = ['name'];
 
     /**
      * Get the product that owns the ProductType
