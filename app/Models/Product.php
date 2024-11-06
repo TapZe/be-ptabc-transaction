@@ -22,7 +22,7 @@ class Product extends Model
      */
     public function type(): HasOne
     {
-        return $this->hasOne(ProductType::class, 'product_type_id');
+        return $this->hasOne(ProductType::class);
     }
 
     /**
@@ -32,7 +32,7 @@ class Product extends Model
      */
     public function stock(): HasOne
     {
-        return $this->hasOne(Stock::class, 'foreign_key', 'local_key');
+        return $this->hasOne(Stock::class);
     }
 
     /**
