@@ -13,6 +13,6 @@ Route::middleware(['authGroup'])->group(function () {
 });
 
 Route::resource('transaction', TransactionController::class)->except(['create', 'edit']);
-Route::get('searchNameDate', [TransactionController::class, 'searchByNameOrDate']);
+Route::get('searchWithSort', [TransactionController::class, 'searchWithSort']);
 Route::get('productTypeBought', [TransactionController::class, 'productTypeBoughtList']);
 Route::resource('product', ProductController::class);
