@@ -12,7 +12,7 @@ class Stock extends Model
      *
      * @var array
      */
-    protected $fillable = ['stock', 'product_id'];
+    protected $fillable = ['quantity', 'product_id'];
 
     /**
      * Get the product associated with the stock

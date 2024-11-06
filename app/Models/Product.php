@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
@@ -16,13 +17,13 @@ class Product extends Model
     protected $fillable = ['name', 'product_type_id'];
 
     /**
-     * Get the type associated with the Product
+     * Get the type that owns the Product
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function type(): HasOne
+    public function type(): BelongsTo
     {
-        return $this->hasOne(ProductType::class);
+        return $this->belongsTo(ProductType::class, 'product_type_id');
     }
 
     /**

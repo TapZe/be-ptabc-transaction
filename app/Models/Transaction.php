@@ -15,7 +15,7 @@ class Transaction extends Model
      */
     protected $fillable = [
         'starting_stock',
-        'selling_stock',
+        'selled_stock',
         'transaction_date',
         'product_id',
         'user_id'
@@ -28,7 +28,7 @@ class Transaction extends Model
      */
     public function product(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Product::class);
     }
 
     /**
