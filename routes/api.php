@@ -10,6 +10,8 @@ Route::middleware(['authGroup'])->group(function () {
         return $request->user();
     });
 
-    Route::resource('transaction', TransactionController::class);
-    Route::resource('product', ProductController::class);
 });
+
+Route::resource('transaction', TransactionController::class)->except(['create', 'edit']);
+Route::get('searchNameDate', [TransactionController::class, 'searchByNameOrDate']);
+Route::resource('product', ProductController::class);
