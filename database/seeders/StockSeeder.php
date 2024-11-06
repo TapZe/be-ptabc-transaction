@@ -14,11 +14,11 @@ class StockSeeder extends Seeder
     public function run(): void
     {
         $datas = [
-            ['stock' => 75, 'product_id' => 1],
-            ['stock' => 76, 'product_id' => 2],
-            ['stock' => 80, 'product_id' => 3],
-            ['stock' => 70, 'product_id' => 4],
-            ['stock' => 75, 'product_id' => 5],
+            ['quantity' => 75, 'product_id' => 1],
+            ['quantity' => 76, 'product_id' => 2],
+            ['quantity' => 80, 'product_id' => 3],
+            ['quantity' => 70, 'product_id' => 4],
+            ['quantity' => 75, 'product_id' => 5],
         ];
 
         foreach ($datas as $data) {
