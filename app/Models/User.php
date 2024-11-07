@@ -46,14 +46,4 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-
-    /**
-     * Get all of the transaction for the User
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function transaction(): HasMany
-    {
-        return $this->hasMany(Transaction::class);
-    }
 }

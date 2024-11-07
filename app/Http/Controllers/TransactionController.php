@@ -16,13 +16,13 @@ class TransactionController extends Controller
     public function index(Request $request)
     {
         $limit = $request->input('limit', 10);
-        $transactions = Transaction::with(['user', 'product.type'])->paginate($limit);
+        $transactions = Transaction::with(['product.type'])->paginate($limit);
         return response()->json($transactions);
     }
 
     public function searchWithSort(Request $request)
     {
-        $query = Transaction::with(['user', 'product.type']);
+        $query = Transaction::with(['product.type']);
 
         if ($request->has('name')) {
             $query->whereHas('product', function ($q) use ($request) {
@@ -74,12 +74,15 @@ class TransactionController extends Controller
         $transaction = [
             'selled_stock' => $request->input('selled_stock'),
             'product_id' => $request->input('product_id'),
-            'user_id' => auth()->user()->id,
             'starting_stock' => $product->stock->quantity,
             'transaction_date' => $request->input('transaction_date', now()),
         ];
 
-        Transaction::created($transaction);
+        $newTransaction = Transaction::create($transaction);
+        $product->stock->quantity -= $request->input('selled_stock');
+        $product->stock->save();
+
+        return response()->json(['message' => 'Transaction updated successfully', 'transaction' => $newTransaction]);
     }
 
     /**
@@ -87,7 +90,7 @@ class TransactionController extends Controller
      */
     public function show(string $id)
     {
-        $transaction = Transaction::with(['user', 'product.type'])->find($id);
+        $transaction = Transaction::with(['product.type'])->find($id);
         return response()->json($transaction);
     }
 
@@ -129,7 +132,7 @@ class TransactionController extends Controller
         }
 
         $transaction->delete();
-        return response()->json(['message' => 'Transaction deleted successfully, stock restored']);
+        return response()->json(null, 204);
     }
 
 

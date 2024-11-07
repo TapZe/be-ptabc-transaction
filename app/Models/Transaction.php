@@ -18,7 +18,6 @@ class Transaction extends Model
         'selled_stock',
         'transaction_date',
         'product_id',
-        'user_id'
     ];
 
     /**
@@ -29,15 +28,5 @@ class Transaction extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
-    }
-
-    /**
-     * Get the user that owns the Transaction
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
     }
 }

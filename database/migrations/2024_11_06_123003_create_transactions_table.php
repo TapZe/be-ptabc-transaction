@@ -16,7 +16,6 @@ return new class extends Migration {
             $table->integer('selled_stock');
             $table->datetime('transaction_date')->default(now());
             $table->foreignId('product_id')->constrained();
-            $table->foreignId('user_id')->constrained();
             $table->timestamps();
         });
     }
