@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\ProductType;
 use App\Models\Transaction;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class TransactionController extends Controller
@@ -141,7 +142,7 @@ class TransactionController extends Controller
         $startDate = $request->input('from');
         $endDate = $request->input('to');
 
-        if ($endDate && strtotime($endDate) > now()) {
+        if ($endDate && Carbon::parse($endDate)->gt(now())) {
             $endDate = now(); // Don't let end date became more than today/current time
         }
 
