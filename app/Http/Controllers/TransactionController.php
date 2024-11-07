@@ -159,7 +159,7 @@ class TransactionController extends Controller
             if ($startDate && $endDate) {
                 $query->whereBetween('transaction_date', [$startDate, $endDate]);
             }
-            $totalSelledStock = $query->sum('selled_stock');
+            $totalSelledStock = (int) $query->sum('selled_stock');
 
             $result[] = [
                 'product_type_id' => $productType->id,
