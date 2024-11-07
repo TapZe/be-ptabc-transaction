@@ -139,8 +139,8 @@ class TransactionController extends Controller
             'from' => 'nullable|date',
             'to' => 'nullable|date|after_or_equal:from',
         ]);
-        $startDate = $request->input('from');
-        $endDate = $request->input('to');
+        $startDate = $request->input('from', '1970-01-01');
+        $endDate = $request->input('to', now());
 
         if ($endDate && Carbon::parse($endDate)->gt(now())) {
             $endDate = now(); // Don't let end date became more than today/current time
