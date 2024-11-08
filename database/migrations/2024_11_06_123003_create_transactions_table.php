@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->datetime('transaction_date')->default(now());
             $table->foreignId('product_id')->constrained();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

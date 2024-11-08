@@ -13,5 +13,6 @@ Route::middleware(['authGroup'])->group(function () {
 
 Route::get('/transaction/search', [TransactionController::class, 'searchWithSort']);
 Route::get('/transaction/typeBought', [TransactionController::class, 'productTypeBoughtList']);
+Route::get('/product/type', [ProductController::class, 'productType']);
 Route::resource('transaction', TransactionController::class)->except(['create', 'edit']);
 Route::resource('product', ProductController::class)->except(['create', 'edit', 'show']);

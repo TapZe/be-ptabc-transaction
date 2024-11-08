@@ -16,18 +16,28 @@ class TransactionController extends Controller
     public function index(Request $request)
     {
         $limit = $request->input('limit', 10);
-        $transactions = Transaction::with(['product.type'])->paginate($limit);
+        $transactions = Transaction::with([
+            'product' => function ($query) {
+                $query->withTrashed(); // Include the one that has been "soft deleted"
+                $query->with('type'); // Add the next relationship
+            }
+        ])->paginate($limit);
         return response()->json($transactions);
     }
 
     public function searchWithSort(Request $request)
     {
-        $query = Transaction::with(['product.type']);
+        $query = Transaction::with([
+            'product' => function ($query) {
+                $query->withTrashed(); // Include the one that has been "soft deleted"
+                $query->with('type'); // Add the next relationship
+            }
+        ]);
 
         if ($request->has('name')) {
             $query->whereHas('product', function ($q) use ($request) {
-                // Filter transactions by product name
-                $q->where('name', 'like', '%' . $request->input('name') . '%');
+                // Filter transactions by product name (withTrashed for soft deleted products)
+                $q->withTrashed()->where('name', 'like', '%' . $request->input('name') . '%');
             });
         }
 
@@ -36,10 +46,10 @@ class TransactionController extends Controller
             $sortOrder = $request->input('sort_order', 'asc');
 
             if ($sortBy === 'name') {
-                $query->whereHas('product', function ($q) use ($sortOrder) {
-                    // Order by the product name
-                    $q->orderBy('name', $sortOrder);
-                });
+                $query->join('products', 'transactions.product_id', '=', 'products.id')
+                    ->withTrashed() // Include products that has been "soft deleted"
+                    ->orderBy('products.name', $sortOrder)
+                    ->select('transactions.*');
             } elseif ($sortBy === 'date') {
                 $query->orderBy('transaction_date', $sortOrder);
             }
@@ -82,7 +92,7 @@ class TransactionController extends Controller
         $product->stock->quantity -= $request->input('selled_stock');
         $product->stock->save();
 
-        return response()->json(['message' => 'Transaction updated successfully', 'transaction' => $newTransaction]);
+        return response()->json(['message' => 'Transaction added successfully', 'transaction' => $newTransaction], 201);
     }
 
     /**
@@ -124,7 +134,7 @@ class TransactionController extends Controller
             return response()->json(['error' => 'Transaction not found'], 404);
         }
 
-        // Restore the stock
+        // Restore the stock if product exist
         $product = $transaction->product;
         if ($product && $product->stock) {
             $product->stock->quantity += $transaction->selled_stock;
