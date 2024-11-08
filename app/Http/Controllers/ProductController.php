@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\ProductType;
 use App\Models\Stock;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -31,7 +32,7 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string',
+            'name' => 'required|string|unique:product,name',
             'stock' => 'nullable|numeric',
             'product_type_id' => 'nullable|numeric',
             'product_type_name' => 'nullable|string',
@@ -81,42 +82,55 @@ class ProductController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'name' => 'nullable|string',
+            'name' => 'nullable|string|unique:products,name,' . $id,
             'stock' => 'nullable|numeric',
             'product_type_id' => 'nullable|numeric',
             'product_type_name' => 'nullable|string',
         ]);
 
-        $product = Product::findOrFail($id);
+        try {
+            $product = Product::findOrFail($id);
 
-        if ($request->has('name')) {
-            $product->name = $request->name;
-        }
-
-        if ($request->has('product_type_id')) {
-            $productType = ProductType::findOrFail($request->product_type_id);
-            $product->product_type_id = $productType->id;
-        } elseif ($request->has('product_type_name')) {
-            $productType = ProductType::create([
-                'name' => $request->product_type_name,
-            ]);
-            $product->product_type_id = $productType->id;
-        }
-
-        $product->save();
-
-        if ($request->has('stock')) {
-            $stock = Stock::where('product_id', $product->id)->first();
-            if ($stock) {
-                $stock->quantity = $request->stock;
-                $stock->save();
+            if ($request->has('name')) {
+                $product->name = $request->name;
             }
-        }
 
-        return response()->json([
-            'message' => 'Product updated successfully',
-            'product' => $product->load('type', 'stock'),
-        ]);
+            $productType = ProductType::find($request->product_type_id);
+            if (!$productType) {
+                if ($request->has('product_type_name')) {
+                    $productType = ProductType::where('name', $request->product_type_name)->first();
+                    if (!$productType) {
+                        $productType = ProductType::create([
+                            'name' => $request->product_type_name,
+                        ]);
+                    }
+                } else {
+                    throw new Exception('Invalid product type ID and no product type name provided.');
+                }
+            }
+            $product->product_type_id = $productType->id;
+            $product->save();
+
+            if ($request->has('stock')) {
+                $stock = Stock::where('product_id', $product->id)->first();
+                if ($stock) {
+                    $stock->quantity = $request->stock;
+                    $stock->save();
+                } else {
+                    Stock::create([
+                        'quantity' => $request->stock,
+                        'product_id' => $product->id
+                    ]);
+                }
+            }
+
+            return response()->json([
+                'message' => 'Product updated successfully',
+                'product' => $product->load('type', 'stock'),
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => 'Product not found'], 404);
+        }
     }
 
     /**
